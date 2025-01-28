@@ -24,6 +24,9 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+env:
+  NEXT_APP: ./stripe-test-app
+
 jobs:
   # Build job
   build:
@@ -32,7 +35,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: ./stripe-test-app
+          path: ${{ env.NEXT_APP }}
           
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -54,21 +57,21 @@ jobs:
           path: |
             .next/cache
           # Generate a new cache whenever packages or source files change.
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('${{ env.NEXT_APP }}/package-lock.json') }}-${{ hashFiles('${{ env.NEXT_APP }}.[jt]s', '${{ env.NEXT_APP }}.[jt]sx') }}
           # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
+            ${{ runner.os }}-nextjs-${{ hashFiles('${{ env.NEXT_APP }}/package-lock.json') }}-
             
       - name: Install dependencies
-        run: npm ci --prefix ./stripe-test-app
+        run: npm ci --prefix ${{ env.NEXT_APP }}
         
       - name: Build with Next.js
-        run: npm run build --prefix ./stripe-test-app
+        run: npm run build --prefix ${{ env.NEXT_APP }}
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./stripe-test-app/out
+          path: ${{ env.NEXT_APP }}/out
 
   # Deployment job
   deploy:
