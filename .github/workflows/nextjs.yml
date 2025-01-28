@@ -25,7 +25,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  NEXT_APP: ./stripe-test-app
+  NEXT_APP: stripe-test-app
 
 jobs:
   # Build job
@@ -55,23 +55,21 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            .next/cache
-          # Generate a new cache whenever packages or source files change.
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('${{ env.NEXT_APP }}/package-lock.json') }}-${{ hashFiles('${{ env.NEXT_APP }}.[jt]s', '${{ env.NEXT_APP }}.[jt]sx') }}
-          # If source files changed but packages didn't, rebuild from a prior cache.
+            ./${{ env.SUBFOLDER }}/.next/cache  # <-- Ensure cache is restored in the correct subfolder
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('${{ env.SUBFOLDER }}/package-lock.json') }}-${{ hashFiles('${{ env.SUBFOLDER }}/**/*.[jt]s', '${{ env.SUBFOLDER }}/**/*.[jt]sx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('${{ env.NEXT_APP }}/package-lock.json') }}-
+            ${{ runner.os }}-nextjs-${{ hashFiles('${{ env.SUBFOLDER }}/package-lock.json') }}-
             
       - name: Install dependencies
-        run: npm ci --prefix ${{ env.NEXT_APP }}
-        
+        run: npm ci --prefix ./${{ env.SUBFOLDER }}
+
       - name: Build with Next.js
-        run: npm run build --prefix ${{ env.NEXT_APP }}
-        
+        run: npm run build --prefix ./${{ env.SUBFOLDER }}
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.NEXT_APP }}/out
+          path: ./${{ env.SUBFOLDER }}/.next
 
   # Deployment job
   deploy:
