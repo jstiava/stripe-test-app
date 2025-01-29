@@ -1,8 +1,10 @@
 import { UseCart } from "@/checkout/useCart";
 import ProductInBagCard from "@/components/ProductInBagCard";
 import { ShoppingBagOutlined } from "@mui/icons-material";
-import { Collapse, Divider, Drawer, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Button, Collapse, Divider, Drawer, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { TransitionGroup } from 'react-transition-group';
+
+import { useState, useEffect } from "react";
 
 
 export default function CartSidebar({
@@ -13,6 +15,30 @@ export default function CartSidebar({
 
     const theme = useTheme();
     const isSm = useMediaQuery(theme.breakpoints.down('sm'));
+
+   
+
+    useEffect(() => {
+        // setConfirmed(new URLSearchParams(window.location.search).get(
+        //     "payment_intent_client_secret"
+        // ));
+    }, []);
+
+    // useEffect(() => {
+    //     // Create PaymentIntent as soon as the page loads
+    //     fetch("/api/create-payment-intent", {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify({ items: [{ id: "xl-tshirt" }] }),
+    //     })
+    //         .then((res) => res.json())
+    //         .then((data) => setClientSecret(data.clientSecret))
+    //         .catch(err => {
+    //             console.log(err);
+    //         });
+    // }, []);
+
+   
 
     return (
         <Drawer
@@ -66,6 +92,16 @@ export default function CartSidebar({
                         </TransitionGroup>
                     </div>
                 )}
+                <div className="column" style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    height: 'fit-content',
+                    padding: "1rem",
+                    width: "100%"
+                }}>
+
+                <Button variant="contained">Continue to Checkout</Button>
+                </div>
             </div>
         </Drawer>
     )

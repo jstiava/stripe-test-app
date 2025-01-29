@@ -7,7 +7,7 @@ import Stripe from "stripe";
 
 export default async function handleRequest(
     req: NextApiRequest,
-    res: NextApiResponse<any>,
+    res: NextApiResponse,
 ) {
     if (req.method != 'POST') {
         res.setHeader('Allow', 'POST');
