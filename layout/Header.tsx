@@ -3,9 +3,12 @@ import {
     ShoppingBagOutlined
   } from '@mui/icons-material';
 import { useRouter } from "next/router";
+import { UseCart } from "@/checkout/useCart";
 
 
-export default function Header() {
+export default function Header({ Cart} : {
+    Cart: UseCart
+}) {
 
     const theme = useTheme();
     const router = useRouter();
@@ -33,7 +36,7 @@ export default function Header() {
             </div>
             <div className="flex fit">
                 <Tooltip title="My Cart">
-                    <IconButton onClick={() => router.push('/cart')}>
+                    <IconButton onClick={() => Cart.toggleSidebar()}>
                         <ShoppingBagOutlined sx={{
                             color: theme.palette.primary.contrastText
                         }} />

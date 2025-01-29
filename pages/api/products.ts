@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { stripe } from "./checkout-session";
+import Stripe from "stripe";
 
 
 async function getAllProducts() {
   try {
+    const stripe = new Stripe(String(process.env.STRIPE_SECRET_KEY));
     const products = await stripe.products.list({
         limit: 10,
       });

@@ -22,35 +22,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           textTransform: 'capitalize',
-          variants: [
-            {
-              props: { variant: "outlined", color: "error" },
-              style: {
-                '&:hover': {
-                  backgroundColor: "#FCEEEE"
-                },
-                backgroundColor: "#F9DDDD"
-              }
-            },
-            {
-              props: { variant: "text", color: "error" },
-              style: {
-                '&:hover': {
-                  backgroundColor: "#FCEEEE"
-                },
-                backgroundColor: "#F9DDDD"
-              }
-            },
-            {
-              props: { color: 'light' },
-              style: {
-                '&:hover': {
-                  backgroundColor: lighten("#0fd9c1", 0.8) || "#ffffff"
-                },
-                backgroundColor: lighten("#0fd9c1", 0.9) || "#ffffff"
-              }
-            }
-          ]
+          fontSize: "1.25rem"
         }
       },
     }

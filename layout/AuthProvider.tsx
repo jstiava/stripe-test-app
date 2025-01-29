@@ -4,6 +4,8 @@ import NextNProgress from 'nextjs-progressbar';
 import theme from '@/styles/theme';
 import Header from "./Header";
 import Footer from "./Footer";
+import useCart from "@/checkout/useCart";
+import CartSidebar from "./CartSidebar";
 
 export default function AuthProvider({
     Component,
@@ -13,15 +15,18 @@ export default function AuthProvider({
     pageProps: any;
 }) {
 
+    const Cart = useCart();
+
 
     return (
         <ThemeProvider theme={theme}>
             <NextNProgress color={'white'} />
-            <Header />
+            <Header Cart={Cart} />
+            <CartSidebar Cart={Cart} />
             <div id="content" className="column snug" style={{
                 minHeight: "100vh"
             }}>
-            <Component {...pageProps} />
+            <Component {...pageProps} Cart={Cart} />
             </div>
             <Footer />
         </ThemeProvider>

@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import Stripe from "stripe";
 
 /**
  * https://docs.stripe.com/checkout/quickstart?client=next
  */
-export const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 export default async function handleRequest(
     req: NextApiRequest,
@@ -13,10 +13,11 @@ export default async function handleRequest(
         res.setHeader('Allow', 'POST');
         res.status(405).end('Method Not Allowed');
     }
+    
 
 
     try {
-        // Create Checkout Sessions from body params.
+        const stripe = new Stripe(String(process.env.STRIPE_SECRET_KEY));
         const session = await stripe.checkout.sessions.create({
             line_items: [
                 {
@@ -29,7 +30,7 @@ export default async function handleRequest(
             success_url: `${req.headers.origin}/?success=true`,
             cancel_url: `${req.headers.origin}/?canceled=true`,
         });
-        res.redirect(303, session.url);
+        res.redirect(303, String(session.url));
     } catch (err) {
         console.log(err);
         res.status(500).json("Something went wrong.");

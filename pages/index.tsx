@@ -1,5 +1,5 @@
 import ProductCard from "@/components/ProductCard";
-import { StripeProduct } from "@/types";
+import { StripeAppProps, StripeProduct } from "@/types";
 import fetchAppServer from "@/utils/fetch";
 import { useTheme } from "@mui/material";
 import Head from "next/head";
@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 
-export default function Home() {
+export default function Home(props : StripeAppProps) {
 
   const theme = useTheme();
   const [products, setProducts] = useState<StripeProduct[] | null>(null);
@@ -29,7 +29,7 @@ export default function Home() {
 
   useEffect(() => {
     getProducts();
-  }, [getProducts]);
+  }, []);
 
 
   if (!products) {
@@ -51,7 +51,14 @@ export default function Home() {
       }}>
         {products.map(product => {
           return (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard 
+              key={product.id} 
+              product={product} 
+              addToCart={() => {
+                props.Cart.add(product);
+                props.Cart.toggleSidebar();
+              }} 
+            />
           )
         })}
       </div>
