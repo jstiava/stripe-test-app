@@ -143,6 +143,10 @@ body, html {
     align-items: flex-end;
   }
 
+  &.left {
+    align-items: flex-start;
+  }
+
   &.center {
     align-items: center;
   }

@@ -57,7 +57,7 @@ export default function CheckoutForm() {
   };
 
   return (
-    <form id="payment-form" onSubmit={handleSubmit} style={{width: "100%"}}>
+    <form className="column" id="payment-form" onSubmit={handleSubmit} style={{width: "100%"}}>
       <PaymentElement id="payment-element" options={paymentElementOptions} />
       <Button variant="contained" fullWidth>
         Continue to Checkout

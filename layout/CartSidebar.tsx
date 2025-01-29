@@ -1,10 +1,11 @@
 import { UseCart } from "@/checkout/useCart";
 import ProductInBagCard from "@/components/ProductInBagCard";
-import { ShoppingBagOutlined } from "@mui/icons-material";
-import { Button, Collapse, Divider, Drawer, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { CloseOutlined, ShoppingBagOutlined } from "@mui/icons-material";
+import { Button, Collapse, Divider, Drawer, IconButton, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { TransitionGroup } from 'react-transition-group';
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 
 
 export default function CartSidebar({
@@ -15,8 +16,9 @@ export default function CartSidebar({
 
     const theme = useTheme();
     const isSm = useMediaQuery(theme.breakpoints.down('sm'));
+    const router = useRouter();
 
-   
+
 
     useEffect(() => {
         // setConfirmed(new URLSearchParams(window.location.search).get(
@@ -38,7 +40,7 @@ export default function CartSidebar({
     //         });
     // }, []);
 
-   
+
 
     return (
         <Drawer
@@ -61,6 +63,13 @@ export default function CartSidebar({
                 },
             }}
         >
+            <IconButton onClick={() => Cart.toggleSidebar()} sx={{
+                position: "absolute",
+                right: "0.5rem",
+                top: "0.5rem"
+            }}>
+                <CloseOutlined />
+            </IconButton>
             <div className="column center" style={{
                 padding: "3rem 1.5rem"
             }}>
@@ -81,15 +90,19 @@ export default function CartSidebar({
                     <div className="column" style={{
                         width: "100%"
                     }}>
-                        <TransitionGroup>
-                            <Collapse>
                                 {Cart.cart.map(product => {
+                                    if (!product.selectedPrice) {
+                                        return null;
+                                    }
                                     return (
-                                        <ProductInBagCard key={product.id} product={product} removeFromCart={() => Cart.remove(product.id)} />
+                                        <ProductInBagCard 
+                                        key={`${product.id}_${product.selectedPrice.id}`} 
+                                        product={product} 
+                                        removeFromCart={Cart.remove} 
+                                        swap={Cart.swap}
+                                        />
                                     )
                                 })}
-                            </Collapse>
-                        </TransitionGroup>
                     </div>
                 )}
                 <div className="column" style={{
@@ -100,7 +113,13 @@ export default function CartSidebar({
                     width: "100%"
                 }}>
 
-                <Button variant="contained">Continue to Checkout</Button>
+                    <Button
+                        variant="contained"
+                        disabled={!Cart.cart || Cart.cart.length === 0}
+                        onClick={() => {
+                            router.push('/checkout');
+                            Cart.toggleSidebar();
+                        }}>Continue to Checkout</Button>
                 </div>
             </div>
         </Drawer>

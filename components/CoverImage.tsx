@@ -30,7 +30,7 @@ export default function CoverImage({ url, height, width, style = {} }: CoverImag
           backgroundColor: theme.palette.primary.main,
           backgroundPosition: 'center',
           opacity: isLoaded ? 1 : 0,
-          transition: 'opacity 1s ease-in-out',
+          // transition: 'opacity 1s ease-in-out',
           ...style,
         }}
       />
@@ -47,7 +47,7 @@ export default function CoverImage({ url, height, width, style = {} }: CoverImag
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         opacity: isLoaded ? 1 : 0,
-        transition: 'opacity 1s ease-in-out',
+        // transition: 'opacity 1s ease-in-out',
         ...style,
       }}
     />

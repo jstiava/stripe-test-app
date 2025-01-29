@@ -25,6 +25,16 @@ const theme = createTheme({
           fontSize: "1.25rem"
         }
       },
+    },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          '& .MuiAlertTitle-root': {
+          fontSize: "1.25rem",
+          margin: "0.05rem 0 0.25rem 0"
+        }
+        }
+      }
     }
   },
   typography: {

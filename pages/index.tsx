@@ -1,20 +1,25 @@
 import ProductCard from "@/components/ProductCard";
 import { StripeAppProps, StripeProduct } from "@/types";
 import fetchAppServer from "@/utils/fetch";
-import { useTheme } from "@mui/material";
+import { useMediaQuery, useTheme } from "@mui/material";
 import Head from "next/head";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
 
-export default function Home(props : StripeAppProps) {
+export default function Home(props: StripeAppProps) {
 
   const theme = useTheme();
   const [products, setProducts] = useState<StripeProduct[] | null>(null);
 
+  const isSm = useMediaQuery(theme.breakpoints.down('sm'));
+
 
   const getProducts = async () => {
 
+    let productList = [];
+    let i = 0;
+    
     const productsFetch = await fetch('/api/products');
 
     if (!productsFetch.ok) {
@@ -22,9 +27,20 @@ export default function Home(props : StripeAppProps) {
     }
 
     const response = await productsFetch.json();
-    
-    setProducts(response.products.data)
 
+    for (i; i < response.products.length; i++) {
+      const product = response.products[i];
+      if (!product.prices || product.prices.length === 0) {
+        continue;
+      }
+      productList.push({
+        ...product,
+        quantity: 1,
+        selectedPrice: product.prices[0]
+      })
+    }
+
+    setProducts(productList);
   }
 
   useEffect(() => {
@@ -38,26 +54,23 @@ export default function Home(props : StripeAppProps) {
 
 
   return (
-    <div className="column"
-    style={{
-      maxWidth: "300rem",
-      width: "100%",
-      padding: "0.5rem",
-    }}>
+    <div className="column center"
+      style={{
+        width: "100%",
+        padding: "0.5rem",
+      }}>
 
-      <div className="flex" style={{
+      <div className={isSm ? 'column compact' : 'flex between'} style={{
         flexWrap: 'wrap',
-        color: theme.palette.text.primary
+        color: theme.palette.text.primary,
+        maxWidth: "70rem"
       }}>
         {products.map(product => {
           return (
-            <ProductCard 
-              key={product.id} 
-              product={product} 
-              addToCart={() => {
-                props.Cart.add(product);
-                props.Cart.toggleSidebar();
-              }} 
+            <ProductCard
+              key={product.id}
+              product={product}
+              addToCart={props.Cart.add}
             />
           )
         })}

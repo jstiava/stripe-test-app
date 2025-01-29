@@ -7,8 +7,21 @@ async function getAllProducts() {
     const stripe = new Stripe(String(process.env.STRIPE_SECRET_KEY));
     const products = await stripe.products.list({
         limit: 10,
+        active: true
       });
-    return products;
+
+    const prices = await stripe.prices.list({
+      active: true
+    })
+
+    const productsWithPrices = products.data.map(product => {
+      return {
+        ...product,
+        prices: prices.data.filter(price => price.product === product.id)
+      }
+    })
+
+    return productsWithPrices;
   } catch (error) {
     console.error('Error retrieving products:', error);
   }

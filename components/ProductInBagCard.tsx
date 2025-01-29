@@ -1,20 +1,65 @@
-import { StripeProduct } from "@/types"
+import { StripePrice, StripeProduct } from "@/types"
 import { Button, ButtonBase, IconButton, Typography, useTheme } from "@mui/material"
 import CoverImageCarousel from "./CoverImageCarousel";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CoverImage from "./CoverImage";
-import { DeleteOutlined } from "@mui/icons-material";
+import { AddOutlined, DeleteOutlined, MinimizeOutlined, Preview, RemoveOutlined } from "@mui/icons-material";
+import { DisplayPrice } from "./ProductCard";
+import PriceSelector from "./PriceSelector";
+import { setConfig } from "next/config";
+import { UseCart } from "@/checkout/useCart";
+import Cart from "@/pages/cart";
 
 
 export default function ProductInBagCard({
     product,
-    removeFromCart
+    removeFromCart,
+    swap
 }: {
     product: StripeProduct,
-    removeFromCart: () => void
+    removeFromCart?: UseCart['remove'],
+    swap?: UseCart['swap']
 }) {
 
     const theme = useTheme();
+
+    const handleChangePrice = (newPrice: StripePrice) => {
+
+        if (!swap) return;
+
+        const newProduct: StripeProduct = {
+            ...product,
+            selectedPrice: newPrice
+        }
+
+        swap(product, newProduct);
+    }
+
+    const handleRemoveFromCart = () => {
+        if (!removeFromCart) return;
+        removeFromCart(product.selectedPrice.id);
+    }
+
+    const handleQuantityChange = (diff: number) => {
+        if (!removeFromCart || !swap) return;
+
+        const newValue = product.quantity + diff;
+
+        if (newValue === 0) {
+            removeFromCart(product.selectedPrice.id);
+            return;
+        }
+
+        const newProduct = {
+            ...product,
+            quantity: newValue
+        }
+
+        swap(product, newProduct);
+
+    }
+
+
     return (
         <ButtonBase className="flex between top"
             disableRipple
@@ -33,22 +78,42 @@ export default function ProductInBagCard({
                     }} />
             )}
             <div className="flex between top"
-            style={{width: "calc(100% - 6rem)"}}
+                style={{ width: "calc(100% - 6rem)" }}
             >
-                <div className="column snug">
-                <Typography variant="h5">{product.name}</Typography>
-                <div className="flex fit">
-                <IconButton onClick={removeFromCart}>
-                    <DeleteOutlined fontSize="small" />
-                </IconButton>
+                <div className="column compact left">
+                    {swap && (
+                        <PriceSelector product={product} handleChangePrice={handleChangePrice} />
+                    )}
+                    <Typography variant="h5" sx={{
+                        textAlign: 'left',
+                        lineHeight: "115%"
+                    }}>{product.name}</Typography>
+                    {!swap && (
+                        <Typography sx={{
+                            textTransform: 'uppercase'
+                        }}>{product.selectedPrice.lookup_key}</Typography>
+                    )}
+                    <Typography>Quantity: {product.quantity}</Typography>
                 </div>
+                <div className="column snug right fit"
+                >
+                    {product.selectedPrice && product.quantity && (
+                        <DisplayPrice product={product} />
+                    )}
+                    {swap && removeFromCart && (
+                        <div className="flex snug">
+                            <IconButton onClick={handleRemoveFromCart}>
+                                <DeleteOutlined fontSize="small" />
+                            </IconButton>
+                            <IconButton onClick={() => handleQuantityChange(-1)}>
+                                <RemoveOutlined fontSize="small" />
+                            </IconButton>
+                            <IconButton onClick={() => handleQuantityChange(1)}>
+                                <AddOutlined fontSize="small" />
+                            </IconButton>
+                        </div>
+                    )}
                 </div>
-                <Typography sx={{
-                    fontSize: "1.25rem",
-                    color: theme.palette.primary.light,
-                    width: "5rem",
-                    textAlign: "right"
-                }}>$45</Typography>
             </div>
         </ButtonBase>
     )

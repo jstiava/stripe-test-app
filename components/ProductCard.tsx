@@ -1,21 +1,103 @@
-import { StripeProduct } from "@/types"
+import { StripePrice, StripeProduct } from "@/types"
 import { Button, ButtonBase, Typography, useTheme } from "@mui/material"
 import CoverImageCarousel from "./CoverImageCarousel";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import PriceSelector from "./PriceSelector";
+import { UseCart } from "@/checkout/useCart";
+import { Preview } from "@mui/icons-material";
 
+const formatPrice = (price: number | null, currency: string): string => {
+    try {
+        if (!price || !currency) {
+            return ""
+        }
+
+        return new Intl.NumberFormat(undefined, {
+            style: "currency",
+            currency,
+        }).format(price / 100);
+
+    }
+    catch (err) {
+        return "";
+    }
+}
+
+
+export function DisplayPrice({
+    product,
+}: {
+    product: StripeProduct,
+}) {
+
+    const theme = useTheme();
+
+    if (!product.selectedPrice) {
+        return (
+            <Typography sx={{
+                fontSize: "1.25rem",
+                color: theme.palette.primary.light,
+                width: "fit-content",
+                maxWidth: "5rem",
+                textAlign: "right"
+            }}>--</Typography>
+        )
+    }
+
+    return (
+        <Typography sx={{
+            fontSize: "1.25rem",
+            color: theme.palette.primary.light,
+            width: "fit-content",
+            maxWidth: "5rem",
+            textAlign: "right"
+        }}>{formatPrice(product.selectedPrice.unit_amount * product.quantity, product.selectedPrice.currency)}</Typography>
+    )
+}
 
 export default function ProductCard({
     product,
     addToCart
 }: {
     product: StripeProduct,
-    addToCart: () => void
+    addToCart: UseCart['add']
 }) {
 
     const theme = useTheme();
     const [isHovering, setIsHovering] = useState(false);
+
+    const [copyOfProduct, setCopyOfProduct] = useState(product);
+
+    useEffect(() => {
+        if (!product.prices || product.prices.length === 0) {
+            return;
+        }
+
+        setCopyOfProduct({
+            ...product,
+            selectedPrice: product.prices[0]
+        })
+    }, [product]);
+
+
+    const handleAddToCart = () => {
+
+        if (!product || !product.prices) {
+            alert("Could not get prices for this item.")
+            return;
+        }
+        addToCart(copyOfProduct)
+    }
+
+    const handleChangePrice = (newPrice: StripePrice) => {
+        setCopyOfProduct(prev => ({
+            ...prev,
+            selectedPrice: newPrice
+        }))
+    }
+
     return (
-        <ButtonBase className="column"
+        <ButtonBase className="column left"
             disableRipple
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
@@ -41,7 +123,7 @@ export default function ProductCard({
                         }} />
                     {isHovering && (
                         <Button variant="contained"
-                            onClick={addToCart}
+                            onClick={handleAddToCart}
                             fullWidth
                             sx={{
                                 position: 'absolute',
@@ -51,7 +133,8 @@ export default function ProductCard({
                     )}
                 </div>
             )}
-            <div className="flex between"
+            <PriceSelector product={copyOfProduct} handleChangePrice={handleChangePrice} />
+            <div className="flex between top"
                 style={{
                     opacity: isHovering ? 0.85 : 1,
                     transition: "0.25s ease-in-out"
@@ -59,14 +142,10 @@ export default function ProductCard({
             >
                 <Typography variant="h5" sx={{
                     maxWidth: "calc(100% - 5rem)",
-                    width: "fit-content"
+                    width: "fit-content",
+                    lineHeight: "115%"
                 }}>{product.name}</Typography>
-                <Typography sx={{
-                    fontSize: "1.25rem",
-                    color: theme.palette.primary.light,
-                    width: "5rem",
-                    textAlign: "right"
-                }}>$45</Typography>
+                <DisplayPrice product={copyOfProduct} />
             </div>
         </ButtonBase>
     )

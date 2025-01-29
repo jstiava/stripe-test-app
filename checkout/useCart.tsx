@@ -1,4 +1,4 @@
-import { StripeProduct } from "@/types";
+import { StripePrice, StripeProduct } from "@/types";
 import { useState } from "react";
 
 
@@ -6,9 +6,11 @@ export interface UseCart {
     cart: StripeProduct[] | null;
     isSidebarOpen: boolean;
     toggleSidebar: () => boolean;
-    add: (item : StripeProduct) => boolean;
-    remove: (id : string) => boolean;
-    get: (id : string) => StripeProduct | null;
+    add: (item: StripeProduct) => boolean;
+    remove: (id: string) => boolean;
+    get: (id: string) => StripeProduct | null;
+    swap: (removedItem: StripeProduct, newItem: StripeProduct) => void;
+    checkout: () => void;
 }
 
 export default function useCart() {
@@ -16,11 +18,11 @@ export default function useCart() {
     const [cart, setCart] = useState<StripeProduct[] | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
-    const add = (item : StripeProduct) => {
+    const add = (item: StripeProduct) => {
+        setIsSidebarOpen(true);
 
-        const existingItem = get(item.id);
+        const existingItem = get(item.selectedPrice.id);
         if (existingItem) {
-            alert("Already in cart");
             return false;
         }
 
@@ -30,28 +32,29 @@ export default function useCart() {
             }
             return [...prev, item]
         })
+
         return true;
     }
 
-    const remove = (id : string) => {
+    const remove = (price_id: string) => {
 
         setCart(prev => {
             if (!prev) {
                 return [];
             }
-            const newCart = prev.filter(p => p.id != id);
+            const newCart = prev.filter(p => p.selectedPrice.id != price_id);
             return newCart;
         })
         return false;
     }
 
-    const get = (id : string) => {
+    const get = (price_id: string) => {
 
         if (!cart) {
             return null;
         }
-        
-        return cart.find(p => p.id === id) || null;
+
+        return cart.find(product => product.selectedPrice.id === price_id) || null;
     }
 
     const toggleSidebar = () => {
@@ -63,5 +66,40 @@ export default function useCart() {
         return newValue;
     }
 
-    return { cart, add, remove, get, isSidebarOpen, toggleSidebar}
+    const swap = (removedItem: StripeProduct, newItem: StripeProduct) => {
+
+        if (!cart) {
+            setCart([newItem]);
+            return;
+        }
+        const filtered = cart.filter(p =>  p.selectedPrice.id != removedItem.selectedPrice.id);
+
+        const alreadyExists = filtered.find(p => p.selectedPrice.id === newItem.selectedPrice.id);
+
+        if (!alreadyExists) {
+            setCart([...filtered, newItem])
+            return;
+        }
+
+        const filteredAgain = filtered.filter(p =>  p.selectedPrice.id != newItem.selectedPrice.id);
+
+        setCart([...filteredAgain, {
+            ...alreadyExists,
+            quantity: alreadyExists.quantity + 1
+        }])
+        return;
+
+    }
+
+    const checkout = () : {price: StripePrice, quantity: number}[] => {
+        if (!cart) {
+            return [];
+        }
+        return cart.map(x => ({
+            price: x.selectedPrice,
+            quantity: x.quantity || 1
+        }))
+    }
+
+    return { cart, add, remove, get, isSidebarOpen, toggleSidebar, swap, checkout }
 }
