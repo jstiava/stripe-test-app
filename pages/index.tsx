@@ -19,7 +19,7 @@ export default function Home(props: StripeAppProps) {
 
     let productList = [];
     let i = 0;
-    
+
     const productsFetch = await fetch('/api/products');
 
     if (!productsFetch.ok) {
@@ -58,6 +58,7 @@ export default function Home(props: StripeAppProps) {
       style={{
         width: "100%",
         padding: "0.5rem",
+        marginTop: "2rem"
       }}>
 
       <div className={isSm ? 'column compact' : 'flex between'} style={{
@@ -65,12 +66,20 @@ export default function Home(props: StripeAppProps) {
         color: theme.palette.text.primary,
         maxWidth: "70rem"
       }}>
-        {products.map(product => {
+        {products.map((product, index) => {
+          const row = Math.floor(index / 3);
+          const col = index % 3;
+
+          // Compute animation delay
+          const delay = (row + col) * 100;
           return (
             <ProductCard
               key={product.id}
               product={product}
               addToCart={props.Cart.add}
+              style={{
+                animationDelay: `${delay}ms`,
+              }}
             />
           )
         })}

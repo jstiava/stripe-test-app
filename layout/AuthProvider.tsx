@@ -7,6 +7,12 @@ import Footer from "./Footer";
 import useCart from "@/checkout/useCart";
 import CartSidebar from "./CartSidebar";
 
+declare module '@mui/material/Button' {
+    interface ButtonPropsVariantOverrides {
+      flipped: true;
+    }
+  }
+
 export default function AuthProvider({
     Component,
     pageProps,

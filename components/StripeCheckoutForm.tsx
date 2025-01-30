@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   PaymentElement,
   useStripe,
@@ -17,13 +17,17 @@ export default function CheckoutForm() {
 
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+
+  useEffect(() => {
+    const param = new URLSearchParams(window.location.search).get("payment_intent_client_secret");
+    setConfirmed(param !== null);
+  }, []);
 
   const handleSubmit = async (e : any) => {
     e.preventDefault();
 
     if (!stripe || !elements) {
-      // Stripe.js hasn't yet loaded.
-      // Make sure to disable form submission until Stripe.js has loaded.
       return;
     }
 
@@ -32,16 +36,10 @@ export default function CheckoutForm() {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        // Make sure to change this to your payment completion page
-        return_url: "http://localhost:3000",
+        return_url: "http://localhost:3000/payment-successful",
       },
     });
 
-    // This point will only be reached if there is an immediate error when
-    // confirming the payment. Otherwise, your customer will be redirected to
-    // your `return_url`. For some payment methods like iDEAL, your customer will
-    // be redirected to an intermediate site first to authorize the payment, then
-    // redirected to the `return_url`.
     if (error.type === "card_error" || error.type === "validation_error") {
         console.log(error)
       setMessage("An error occurred.");
@@ -56,19 +54,18 @@ export default function CheckoutForm() {
     layout: 'accordion' as Layout,
   };
 
+  if (!stripe || !elements) {
+    return <></>;
+  }
+
   return (
-    <form className="column" id="payment-form" onSubmit={handleSubmit} style={{width: "100%"}}>
+    <div className="column" id="payment-form"  style={{width: "100%"}}>
       <PaymentElement id="payment-element" options={paymentElementOptions} />
-      <Button variant="contained" fullWidth>
+      <Button variant="contained" fullWidth onClick={handleSubmit}>
         Continue to Checkout
       </Button>
-      {/* <button disabled={isLoading || !stripe || !elements} id="submit">
-        <span id="button-text">
-          {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
-        </span>
-      </button> */}
       {/* Show any error or success messages */}
       {message && <div id="payment-message">{message}</div>}
-    </form>
+    </div>
   );
 }

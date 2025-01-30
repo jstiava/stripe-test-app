@@ -23,13 +23,7 @@ export default async function handleRequest(
         }
         const stripe = new Stripe(String(process.env.STRIPE_SECRET_KEY));
         const session = await stripe.checkout.sessions.create({
-            line_items: [
-                {
-                    // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                    price: '{{PRICE_ID}}',
-                    quantity: 1,
-                },
-            ],
+            line_items,
             mode: 'payment',
             success_url: `${req.headers.origin}/?success=true`,
             cancel_url: `${req.headers.origin}/?canceled=true`,

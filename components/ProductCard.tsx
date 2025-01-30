@@ -1,12 +1,13 @@
 import { StripePrice, StripeProduct } from "@/types"
 import { Button, ButtonBase, Typography, useTheme } from "@mui/material"
 import CoverImageCarousel from "./CoverImageCarousel";
-import { useEffect, useState } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import PriceSelector from "./PriceSelector";
 import { UseCart } from "@/checkout/useCart";
 import { Preview } from "@mui/icons-material";
+import { Router, useRouter } from "next/router";
 
-const formatPrice = (price: number | null, currency: string): string => {
+export const formatPrice = (price: number | null, currency: string): string => {
     try {
         if (!price || !currency) {
             return ""
@@ -26,8 +27,10 @@ const formatPrice = (price: number | null, currency: string): string => {
 
 export function DisplayPrice({
     product,
+    style = {}
 }: {
     product: StripeProduct,
+    style?: CSSProperties
 }) {
 
     const theme = useTheme();
@@ -39,7 +42,8 @@ export function DisplayPrice({
                 color: theme.palette.primary.light,
                 width: "fit-content",
                 maxWidth: "5rem",
-                textAlign: "right"
+                textAlign: "right",
+                ...style
             }}>--</Typography>
         )
     }
@@ -50,19 +54,23 @@ export function DisplayPrice({
             color: theme.palette.primary.light,
             width: "fit-content",
             maxWidth: "5rem",
-            textAlign: "right"
+            textAlign: "right",
+            ...style
         }}>{formatPrice(product.selectedPrice.unit_amount * product.quantity, product.selectedPrice.currency)}</Typography>
     )
 }
 
 export default function ProductCard({
     product,
-    addToCart
+    addToCart,
+    style = {}
 }: {
     product: StripeProduct,
-    addToCart: UseCart['add']
+    addToCart: UseCart['add'],
+    style?: CSSProperties
 }) {
 
+    const router = useRouter();
     const theme = useTheme();
     const [isHovering, setIsHovering] = useState(false);
 
@@ -80,7 +88,8 @@ export default function ProductCard({
     }, [product]);
 
 
-    const handleAddToCart = () => {
+    const handleAddToCart = (e : any) => {
+        e.stopPropagation();
 
         if (!product || !product.prices) {
             alert("Could not get prices for this item.")
@@ -97,13 +106,18 @@ export default function ProductCard({
     }
 
     return (
-        <ButtonBase className="column left"
+        <ButtonBase className="column left top"
             disableRipple
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
+            onClick={() => router.push(`/item/${product.id}`)}
             style={{
                 width: "22.5rem",
-                padding: "2rem"
+                padding: "2rem",
+                animation: `popIn 0.5s ease forwards`,
+                transform: "scale(0)",
+                opacity: 0,
+                ...style
             }}>
             {product.images && (
                 <div className="column snug center"
@@ -133,17 +147,21 @@ export default function ProductCard({
                     )}
                 </div>
             )}
-            <PriceSelector product={copyOfProduct} handleChangePrice={handleChangePrice} />
+            <PriceSelector 
+                product={copyOfProduct} 
+                handleChangePrice={handleChangePrice} 
+            />
             <div className="flex between top"
                 style={{
                     opacity: isHovering ? 0.85 : 1,
-                    transition: "0.25s ease-in-out"
+                transition: "0.25s ease-in-out"
                 }}
             >
                 <Typography variant="h5" sx={{
                     maxWidth: "calc(100% - 5rem)",
                     width: "fit-content",
-                    lineHeight: "115%"
+                    lineHeight: "115%",
+                    textAlign: 'left'
                 }}>{product.name}</Typography>
                 <DisplayPrice product={copyOfProduct} />
             </div>

@@ -3,9 +3,11 @@ import ProductInBagCard from "@/components/ProductInBagCard";
 import { CloseOutlined, ShoppingBagOutlined } from "@mui/icons-material";
 import { Button, Collapse, Divider, Drawer, IconButton, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { TransitionGroup } from 'react-transition-group';
+import EmptyBag from '@/public/EmptyBag.webp'
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 
 export default function CartSidebar({
@@ -85,7 +87,11 @@ export default function CartSidebar({
                     width: "100%"
                 }} ></Divider>
                 {!Cart.cart || Cart.cart.length === 0 ? (
-                    <Typography>Cart is empty.</Typography>
+                    <div className="column compact center middle" style={{
+                        height: "100%"
+                    }}>
+                        <Typography>Bag is empty.</Typography>
+                    </div>
                 ) : (
                     <div className="column" style={{
                         width: "100%"

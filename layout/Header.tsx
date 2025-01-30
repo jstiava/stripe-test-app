@@ -1,4 +1,4 @@
-import { Typography, useTheme, Tooltip, IconButton, Button, useMediaQuery } from "@mui/material";
+import { Typography, useTheme, Tooltip, IconButton, Button, useMediaQuery, Badge } from "@mui/material";
 import {
     ShoppingBagOutlined
 } from '@mui/icons-material';
@@ -14,7 +14,7 @@ export default function Header({ Cart }: {
     const router = useRouter();
 
     const isSm = useMediaQuery(theme.breakpoints.down('sm'));
-    
+
     return (
         <header
             className="flex center middle right"
@@ -26,17 +26,18 @@ export default function Header({ Cart }: {
                 cursor: 'pointer',
                 height: "8rem"
             }}
-            onClick={() => {
-                router.push('/')
-            }}
+
         >
-            <div className="column compact fit center middle" 
-            style={{
-                position: "absolute",
-                left: isSm ? "2rem" : "50vw",
-                width: "10rem",
-                transform: isSm ? "unset" : "translate(-50%, 0)"
-            }}>
+            <div className="column compact fit center middle"
+                onClick={() => {
+                    router.push('/')
+                }}
+                style={{
+                    position: "absolute",
+                    left: isSm ? "2rem" : "50vw",
+                    width: "10rem",
+                    transform: isSm ? "unset" : "translate(-50%, 0)"
+                }}>
                 <Typography sx={{
                     fontSize: "2rem",
                     textAlign: 'center'
@@ -53,13 +54,35 @@ export default function Header({ Cart }: {
                 {router.asPath === "/checkout" ? (
                     <Button variant="contained" onClick={() => router.push('/')}>Continue Shopping</Button>
                 ) : (
-                    <Tooltip title="My Cart">
-                        <IconButton onClick={() => Cart.toggleSidebar()}>
-                            <ShoppingBagOutlined sx={{
-                                color: theme.palette.primary.contrastText
-                            }} />
-                        </IconButton>
-                    </Tooltip>
+                    <div className="flex fit">
+                        <Badge
+                            badgeContent={Cart.cart?.length || 0}
+                            invisible={!Cart.cart || Cart.cart.length === 0}
+                            sx={{
+                                '& .MuiBadge-badge': {
+                                    backgroundColor: theme.palette.primary.contrastText,
+                                    color: theme.palette.primary.main
+                                }
+                            }}>
+                            <Tooltip title="My Cart">
+                                <IconButton onClick={() => Cart.toggleSidebar()}>
+                                    <ShoppingBagOutlined sx={{
+                                        color: theme.palette.primary.contrastText
+                                    }} />
+                                </IconButton>
+                            </Tooltip>
+                        </Badge>
+                        <div style={{
+                            width: "0rem"
+                        }}></div>
+                                    {Cart.cart && Cart.cart.length > 0 && (
+                                        <Button variant="flipped" sx={{height: "2.5rem"}}
+                                        onClick={() => {
+                                            router.push('/checkout');
+                                        }}
+                                        >Checkout</Button>
+                                    )}
+                    </div>
                 )}
             </div>
         </header>

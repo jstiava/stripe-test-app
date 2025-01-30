@@ -1,6 +1,27 @@
+import { StripePrice, StripeProduct } from "@/types";
 import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 
+
+
+async function getProductById(productId: string) : Promise<any | null> {
+  try {
+    const stripe = new Stripe(String(process.env.STRIPE_SECRET_KEY));
+    const product = await stripe.products.retrieve(productId);
+
+    const prices = await stripe.prices.list({
+      product: productId,
+    });
+
+    return {
+      ...product,
+      prices: prices.data
+    };
+  } catch (error) {
+    console.error("Error retrieving product:", error);
+    return null;
+  }
+}
 
 async function getAllProducts() {
   try {
@@ -34,6 +55,19 @@ export default async function handleRequest(
 ) {
     if (req.method != 'GET') {
         res.status(405).end('Method Not Allowed');
+    }
+
+    const product_id = req.query.id;
+
+    if (product_id) {
+      const product = await getProductById(String(product_id))
+      if (!product) {
+        throw Error("No product found by that id.")
+      }
+      return res.status(200).json({
+        message: "Success. Got one product.",
+        product
+      })
     }
 
     try {

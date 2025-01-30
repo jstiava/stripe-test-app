@@ -1,4 +1,4 @@
-import { createTheme, lighten } from "@mui/material";
+import { alpha, createTheme, darken, lighten } from "@mui/material";
 import { Playwrite_IN, Zain } from "next/font/google";
 
 const playwrite_cursive_font = Playwrite_IN({
@@ -22,7 +22,19 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           textTransform: 'capitalize',
-          fontSize: "1.25rem"
+          fontSize: "1.25rem",
+          variants: [
+            {
+              props: { variant: "flipped" },
+              style: {
+                  '&:hover': {
+                      backgroundColor: alpha('#ffffff', 0.8),
+                  },
+                  backgroundColor: '#ffffff',
+                  color: '#46210A',
+              }
+          },
+          ]
         }
       },
     },
@@ -35,15 +47,22 @@ const theme = createTheme({
         }
         }
       }
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          fontFamily: [
+            zain_sans_font.style.fontFamily,
+            'sans',
+          ].join(','),
+        }
+      }
     }
   },
   typography: {
     h1: {
       fontSize: "2.5rem",
-      fontFamily: [
-        playwrite_cursive_font.style.fontFamily,
-        'sans-serif',
-      ].join(','),
+     
     },
     h2: {
       fontSize: "2.25rem",
