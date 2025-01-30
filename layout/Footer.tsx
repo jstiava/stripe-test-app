@@ -1,4 +1,4 @@
-import { EmailOutlined, HomeOutlined, ScheduleOutlined, StoreOutlined } from "@mui/icons-material";
+import { CopyrightOutlined, EmailOutlined, HomeOutlined, ScheduleOutlined, StoreOutlined } from "@mui/icons-material";
 import { Link, Typography, useMediaQuery, useTheme } from "@mui/material";
 
 
@@ -42,6 +42,20 @@ export default function Footer() {
                             color: theme.palette.primary.contrastText,
                             textDecorationColor: theme.palette.primary.contrastText
                         }}>cozythreads@stripe.com</Link>
+                    </div>
+                    <div className="flex compact fit top">
+                        <CopyrightOutlined fontSize="small" />
+                        <Link href={"https://terandina.com"} sx={{
+                            color: theme.palette.primary.contrastText,
+                            textDecorationColor: theme.palette.primary.contrastText
+                        }}>Assets Used with Permission from Ternandina</Link>
+                    </div>
+                    <div className="flex compact fit top">
+                        <CopyrightOutlined fontSize="small" />
+                        <Link href={"https://terandina.com"} sx={{
+                            color: theme.palette.primary.contrastText,
+                            textDecorationColor: theme.palette.primary.contrastText
+                        }}>Made by Jeremy Stiava</Link>
                     </div>
 
                 </div>
