@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 
-export default function Home(props: StripeAppProps) {
+export default function ErrorPage(props: StripeAppProps) {
 
     const theme = useTheme();
     const router = useRouter();
@@ -26,7 +26,7 @@ export default function Home(props: StripeAppProps) {
             <Typography variant="h1" sx={{
                 fontSize: "8rem"
             }}>404</Typography>
-            <Typography variant="h2">Errors don't make use cozy either.</Typography>
+            <Typography variant="h2">Errors don&apos;t make us cozy either.</Typography>
             <Button variant="flipped" onClick={() => router.push('/')}>
                 Go to Homepage
             </Button>
